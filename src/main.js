@@ -104,25 +104,79 @@ function setChapter(index) {
 }
 
 async function loadVideo(video, url) {
+  let source = url;
   try {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const blob = await response.blob();
-    video.src = URL.createObjectURL(blob);
+    source = URL.createObjectURL(blob);
   } catch {
-    video.src = url;
+    // Direct media loading remains available if a browser blocks blob fetching.
   }
-  video.load();
+  return new Promise((resolve, reject) => {
+    video.addEventListener('loadeddata', () => {
+      video.dataset.ready = 'true';
+      resolve();
+    }, { once: true });
+    video.addEventListener('error', () => reject(new Error(`Cannot load ${url}`)), { once: true });
+    video.src = source;
+    video.load();
+  });
 }
 
-if (!reduceMotion) {
-  Promise.all([
-    loadVideo(videoA, 'assets/flight-two.mp4'),
-    loadVideo(videoB, 'assets/flight-one.mp4')
-  ]);
-  [videoA, videoB].forEach(video => {
-    video.addEventListener('loadeddata', () => { video.dataset.ready = 'true'; });
+const loader = $('#site-loader');
+const loaderProgress = $('#loader-progress');
+const loaderPercent = $('#loader-percent');
+const loaderStatus = $('#loader-status');
+const loaderStarted = performance.now();
+const imageAssets = [
+  'aerial-one.webp', 'aerial-two.webp', 'aerial-three.webp',
+  'architecture.webp', 'balcony-panorama.webp', 'building.webp',
+  'courtyard.webp', 'facade.webp', 'final-aerial.jpg',
+  'night.webp', 'winter.webp'
+];
+function preloadImage(path) {
+  const image = new Image();
+  image.src = `assets/${path}`;
+  return image.decode();
+}
+function limitWait(promise) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Media load timed out')), 90000);
+    Promise.resolve(promise).then(
+      value => { clearTimeout(timer); resolve(value); },
+      error => { clearTimeout(timer); reject(error); }
+    );
   });
+}
+const loadTasks = imageAssets.map(preloadImage);
+loadTasks.push(document.fonts.ready);
+if (!reduceMotion) {
+  loadTasks.push(loadVideo(videoA, 'assets/flight-two.mp4'));
+  loadTasks.push(loadVideo(videoB, 'assets/flight-one.mp4'));
+}
+let loadedCount = 0;
+Promise.allSettled(loadTasks.map(task => limitWait(task).finally(() => {
+  loadedCount += 1;
+  const progress = Math.round(loadedCount / loadTasks.length * 100);
+  loaderProgress.style.width = `${progress}%`;
+  loaderPercent.textContent = `${String(progress).padStart(2, '0')}%`;
+  loaderStatus.textContent = `Готовим кадры и панораму · ${String(loadedCount).padStart(2, '0')} / ${loadTasks.length}`;
+}))).then(async results => {
+  await new Promise(resolve => setTimeout(resolve, Math.max(0, 850 - (performance.now() - loaderStarted))));
+  loaderStatus.textContent = results.some(result => result.status === 'rejected')
+    ? 'Некоторые материалы недоступны — открываем сайт'
+    : 'Всё готово. Добро пожаловать.';
+  document.body.classList.remove('is-loading');
+  document.body.setAttribute('aria-busy', 'false');
+  loader.classList.add('is-done');
+  setTimeout(() => loader.remove(), 950);
+  if (location.hash) {
+    requestAnimationFrame(() => document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView({ behavior: 'instant' }));
+  }
+});
+
+if (!reduceMotion) {
   const prime = () => {
     [videoA, videoB].forEach(async video => {
       if (video.readyState >= 2) {

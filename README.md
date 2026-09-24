@@ -10,6 +10,8 @@ python3 -m http.server 4173
 
 Open [http://localhost:4173](http://localhost:4173). No package installation or build step is required.
 
+The opening loader waits for the optimized site images, panorama, fonts, and both scroll videos to be ready. The full resolution source files remain in the repository for future edits.
+
 ## Floor-specific views
 
 The supplied folder contains **one** 2:1 panorama. The interface currently uses that same panorama for every floor and states this clearly to visitors. To add verified floor views, place each 2:1 equirectangular image in `assets/` and add its path to `panoramaByFloor` in `src/main.js`, for example:
