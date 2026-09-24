@@ -1,0 +1,7 @@
+.DS_Store
+node_modules/
+
+# Unoptimized source media kept locally; the website uses assets/.
+/*.png
+/*.jpg
+/*.mp4
