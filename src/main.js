@@ -13,7 +13,7 @@ if (location.hash) {
   });
 }
 const buildingStage = $('.building-stage');
-buildingStage.querySelector('img').src = '/assets/final-aerial.jpg';
+buildingStage.querySelector('img').src = 'assets/final-aerial.jpg';
 const buildingSvg = buildingStage.querySelector('svg');
 buildingSvg.setAttribute('viewBox', '0 0 1600 900');
 buildingSvg.innerHTML = `
@@ -117,8 +117,8 @@ async function loadVideo(video, url) {
 
 if (!reduceMotion) {
   Promise.all([
-    loadVideo(videoA, '/assets/flight-two.mp4'),
-    loadVideo(videoB, '/assets/flight-one.mp4')
+    loadVideo(videoA, 'assets/flight-two.mp4'),
+    loadVideo(videoB, 'assets/flight-one.mp4')
   ]);
   [videoA, videoB].forEach(video => {
     video.addEventListener('loadeddata', () => { video.dataset.ready = 'true'; });
@@ -202,7 +202,7 @@ const modal = $('#pano-modal');
 let previousFocus = null;
 // Add verified, floor-specific equirectangular images here as they become available.
 const panoramaByFloor = {};
-const defaultPanorama = '/assets/balcony-panorama.webp';
+const defaultPanorama = 'assets/balcony-panorama.webp';
 let loadedPanorama = defaultPanorama;
 const panoramaPreload = new Image();
 panoramaPreload.src = defaultPanorama;

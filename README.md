@@ -16,8 +16,8 @@ The supplied folder contains **one** 2:1 panorama. The interface currently uses 
 
 ```js
 const panoramaByFloor = {
-  12: '/assets/floor-12.webp',
-  16: '/assets/floor-16.webp'
+  12: 'assets/floor-12.webp',
+  16: 'assets/floor-16.webp'
 };
 ```
 
@@ -26,3 +26,7 @@ Unmapped floors retain the clearly labeled demonstration panorama. The supplied 
 ## Source
 
 Project facts and copy are based on the [official 4U Tashkent page](https://nrg-bi.uz/uz-ru/landing/4u-tashkent). The building renders, aerial clips, and panorama came from the materials supplied with this project.
+
+## GitHub Pages
+
+The site uses relative asset paths and can be served from a repository subpath. Its published URL is [yusufmax.github.io/foryoutest](https://yusufmax.github.io/foryoutest/).
