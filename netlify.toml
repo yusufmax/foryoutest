@@ -1,0 +1,3 @@
+[build]
+  command = "mkdir -p dist && cp index.html favicon.svg dist/ && cp -R assets src vendor dist/"
+  publish = "dist"
